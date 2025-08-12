@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>爱心星星 - 一起捕捉我们的梦想 ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            background: linear-gradient(180deg, #0f0c29 0%, #24243e 50%, #302b63 100%);
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* 闪烁的背景星星 */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 800px;
+            max-height: 600px;
+            position: relative;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(15,12,41,0.8) 0%, rgba(36,36,62,0.8) 50%, rgba(48,43,99,0.8) 100%);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .game-header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .game-title {
+            color: #fff;
+            font-size: 2.2em;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
+            font-weight: bold;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            50% { text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 40px rgba(138,43,226,0.5); }
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 30px;
+            color: white;
+            font-size: 1.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            font-weight: bold;
+        }
+
+        .basket {
+            position: absolute;
+            bottom: 20px;
+            width: 80px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-radius: 50px 50px 20px 20px;
+            border: 3px solid #fff;
+            box-shadow: 0 0 15px rgba(255,107,107,0.6);
+            transition: transform 0.1s ease;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .basket:active {
+            transform: scale(0.95);
+        }
+
+        .falling-star {
+            position: absolute;
+            font-size: 25px;
+            animation: fall linear;
+            z-index: 5;
+            cursor: pointer;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        @keyframes fall {
+            from {
+                top: -50px;
+                transform: rotate(0deg);
+            }
+            to {
+                top: calc(100vh + 50px);
+                transform: rotate(360deg);
+            }
+        }
+
+        .comet {
+            position: absolute;
+            font-size: 35px;
+            animation: cometFall linear;
+            z-index: 5;
+            cursor: pointer;
+            filter: drop-shadow(0 0 15px #ffd700);
+        }
+
+        @keyframes cometFall {
+            from {
+                top: -50px;
+                left: -50px;
+                transform: rotate(0deg);
+            }
+            to {
+                top: calc(100vh + 50px);
+                left: calc(100vw + 50px);
+                transform: rotate(720deg);
+            }
+        }
+
+        .caught-effect {
+            position: absolute;
+            font-size: 20px;
+            color: #ffd700;
+            animation: catchEffect 1s ease-out forwards;
+            z-index: 15;
+            pointer-events: none;
+            font-weight: bold;
+        }
+
+        @keyframes catchEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3) translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .power-up {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        .power-up.active {
+            opacity: 1;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255,255,255,0.2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(138,43,226,0.3);
+            z-index: 1000;
+            display: none;
+            color: white;
+        }
+
+        .game-over h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(255,215,0,0.6);
+            font-weight: bold;
+        }
+
+        .game-over p {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #8a2be2, #9370db);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.3em;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(138,43,226,0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(138,43,226,0.6);
+        }
+
+        .love-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            font-size: 1em;
+            text-align: center;
+            z-index: 100;
+            animation: fadeInOut 4s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .instructions {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.9);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            text-align: center;
+            font-size: 1em;
+            z-index: 100;
+            max-width: 300px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .game-title {
+                font-size: 1.8em;
+            }
+            
+            .game-stats {
+                font-size: 1em;
+                gap: 20px;
+            }
+            
+            .basket {
+                width: 70px;
+                height: 45px;
+            }
+            
+            .instructions {
+                font-size: 0.9em;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景星星 -->
+    <div class="stars" id="backgroundStars"></div>
+    
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">✨ 爱心星星 ✨</div>
+            <div class="game-stats">
+                <div>得分: <span id="score">0</span></div>
+                <div>生命: <span id="lives">❤️❤️❤️</span></div>
+                <div>时间: <span id="timer">60</span>秒</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            拖拽篮子接住落下的星星！<br>
+            ⭐ 普通星星 = 10分<br>
+            🌟 金色星星 = 25分<br>
+            ☄️ 彗星 = 50分！
+        </div>
+
+        <div class="basket" id="basket">🥰</div>
+        
+        <div class="power-up" id="powerUp">
+            💫 流星雨活跃中！💫
+        </div>
+        
+        <div class="game-over" id="gameOver">
+            <h2>我们的爱闪闪发光！✨</h2>
+            <p>你接住了 <span id="finalScore">0</span> 颗星星！</p>
+            <p>就像你俘获了我的心一样！💕</p>
+            <p id="scoreMessage"></p>
+            <button class="restart-btn" onclick="restartGame()">一起再接更多星星</button>
+        </div>
+        
+    </div>
+
+    <script>
+        let gameContainer = document.querySelector('.game-container');
+        let basket = document.getElementById('basket');
+        let scoreElement = document.getElementById('score');
+        let livesElement = document.getElementById('lives');
+        let timerElement = document.getElementById('timer');
+        let gameOverScreen = document.getElementById('gameOver');
+        let finalScoreElement = document.getElementById('finalScore');
+        let powerUpElement = document.getElementById('powerUp');
+        let scoreMessageElement = document.getElementById('scoreMessage');
+        
+        let score = 0;
+        let lives = 3;
+        let timeLeft = 60;
+        let gameRunning = true;
+        let fallingItems = [];
+        let isStarShower = false;
+        
+        // 篮子位置
+        let basketPos = {
+            x: gameContainer.offsetWidth / 2 - 40
+        };
+        
+        // 触摸/鼠标处理
+        let isDragging = false;
+        let touchOffset = { x: 0 };
+        
+        // 初始化
+        updateBasketPosition();
+        createBackgroundStars();
+        
+        // 篮子控制
+        basket.addEventListener('touchstart', startDrag);
+        basket.addEventListener('mousedown', startDrag);
+        
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mousemove', drag);
+        
+        document.addEventListener('touchend', stopDrag);
+        document.addEventListener('mouseup', stopDrag);
+        
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            
+            let touch = e.touches ? e.touches[0] : e;
+            let rect = gameContainer.getBoundingClientRect();
+            
+            touchOffset.x = touch.clientX - rect.left - basketPos.x - 40;
+            basket.style.cursor = 'grabbing';
+        }
+        
+        function drag(e) {
+            if (!isDragging || !gameRunning) return;
+            e.preventDefault();
+            
+            let touch = e.touches ? e.touches[0] : e;
+            let rect = gameContainer.getBoundingClientRect();
+            
+            basketPos.x = Math.max(0, Math.min(gameContainer.offsetWidth - 80, 
+                touch.clientX - rect.left - touchOffset.x - 40));
+            
+            updateBasketPosition();
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            basket.style.cursor = 'grab';
+        }
+        
+        function updateBasketPosition() {
+            basket.style.left = basketPos.x + 'px';
+        }
+        
+        // 创建背景星星
+        function createBackgroundStars() {
+            let starsContainer = document.getElementById('backgroundStars');
+            for (let i = 0; i < 50; i++) {
+                let star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 创建下落物品
+        function createFallingItem() {
+            if (!gameRunning) return;
+            
+            let item = document.createElement('div');
+            let itemType = Math.random();
+            
+            if (itemType < 0.05) { // 5% 彗星
+                item.className = 'comet';
+                item.textContent = '☄️';
+                item.dataset.points = '50';
+                item.style.animationDuration = '3s';
+            } else if (itemType < 0.25) { // 20% 金色星星
+                item.className = 'falling-star';
+                item.textContent = '🌟';
+                item.dataset.points = '25';
+                item.style.animationDuration = Math.random() * 2 + 3 + 's';
+            } else { // 75% 普通星星
+                item.className = 'falling-star';
+                item.textContent = ['⭐', '✨', '💫'][Math.floor(Math.random() * 3)];
+                item.dataset.points = '10';
+                item.style.animationDuration = Math.random() * 2 + 4 + 's';
+            }
+            
+            item.style.left = Math.random() * (gameContainer.offsetWidth - 50) + 'px';
+            gameContainer.appendChild(item);
+            fallingItems.push(item);
+            
+            // 当物品落下屏幕时移除
+            setTimeout(() => {
+                if (item.parentNode && !item.caught) {
+                    if (item.dataset.points !== '50') { // 错过彗星不失去生命
+                        loseLife();
+                    }
+                    item.remove();
+                    fallingItems = fallingItems.filter(i => i !== item);
+                }
+            }, parseFloat(item.style.animationDuration) * 1000);
+        }
+        
+        // 检查碰撞
+        function checkCollisions() {
+            if (!gameRunning) return;
+            
+            fallingItems.forEach((item, index) => {
+                if (item.caught) return;
+                
+                let itemRect = item.getBoundingClientRect();
+                let basketRect = basket.getBoundingClientRect();
+                
+                if (itemRect.left < basketRect.right &&
+                    itemRect.right > basketRect.left &&
+                    itemRect.top < basketRect.bottom &&
+                    itemRect.bottom > basketRect.top - 20) {
+                    
+                    catchItem(item, index);
+                }
+            });
+        }
+        
+        function catchItem(item, index) {
+            item.caught = true;
+            let points = parseInt(item.dataset.points);
+            score += points;
+            scoreElement.textContent = score;
+            
+            // 创建接住特效
+            let effect = document.createElement('div');
+            effect.className = 'caught-effect';
+            effect.textContent = '+' + points;
+            effect.style.left = item.style.left;
+            effect.style.top = item.offsetTop + 'px';
+            gameContainer.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 1000);
+            
+            // 移除被接住的物品
+            item.remove();
+            fallingItems.splice(index, 1);
+            
+            // 篮子庆祝动画
+            basket.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                basket.style.transform = 'scale(1)';
+            }, 200);
+            
+            // 偶尔触发流星雨
+            if (score > 0 && score % 200 === 0) {
+                triggerStarShower();
+            }
+        }
+        
+        function loseLife() {
+            lives--;
+            let heartDisplay = '';
+            for (let i = 0; i < lives; i++) {
+                heartDisplay += '❤️';
+            }
+            for (let i = lives; i < 3; i++) {
+                heartDisplay += '🖤';
+            }
+            livesElement.textContent = heartDisplay;
+            
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+        
+        function triggerStarShower() {
+            isStarShower = true;
+            powerUpElement.classList.add('active');
+            
+            // 快速创建很多星星
+            let showerCount = 0;
+            let showerInterval = setInterval(() => {
+                createFallingItem();
+                createFallingItem();
+                showerCount++;
+                
+                if (showerCount >= 10) {
+                    clearInterval(showerInterval);
+                    isStarShower = false;
+                    powerUpElement.classList.remove('active');
+                }
+            }, 300);
+        }
+        
+        // 游戏计时器
+        function startTimer() {
+            let timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        // 游戏循环
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            checkCollisions();
+            
+            // 创建下落物品
+            if (Math.random() < (isStarShower ? 0.3 : 0.06)) {
+                createFallingItem();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            finalScoreElement.textContent = score;
+            
+            let message = '';
+            if (score >= 500) {
+                message = "你是我的流星！🌟";
+            } else if (score >= 300) {
+                message = "你照亮了我的世界！✨";
+            } else if (score >= 100) {
+                message = "你绝对是最棒的！💫";
+            } else {
+                message = "和你在一起的每一刻都很神奇！💕";
+            }
+            
+            scoreMessageElement.textContent = message;
+            gameOverScreen.style.display = 'block';
+        }
+        
+        function restartGame() {
+            gameRunning = true;
+            score = 0;
+            lives = 3;
+            timeLeft = 60;
+            isStarShower = false;
+            
+            scoreElement.textContent = score;
+            livesElement.textContent = '❤️❤️❤️';
+            timerElement.textContent = timeLeft;
+            gameOverScreen.style.display = 'none';
+            powerUpElement.classList.remove('active');
+            
+            // 清除所有下落物品
+            fallingItems.forEach(item => item.remove());
+            fallingItems = [];
+            
+            // 重置篮子位置
+            basketPos.x = gameContainer.offsetWidth / 2 - 40;
+            updateBasketPosition();
+            
+            // 重新开始游戏
+            startTimer();
+            gameLoop();
+        }
+        
+        // 初始化游戏
+        function initGame() {
+            startTimer();
+            gameLoop();
+        }
+        
+        // 开始游戏
+        initGame();
+        
+        // 防止触摸设备上的滚动
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
